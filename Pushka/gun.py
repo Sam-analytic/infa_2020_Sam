@@ -1,7 +1,15 @@
 from random import randrange as rnd, choice
 import tkinter as tk
+import numpy as np
 import math
 import time
+
+
+white = (0,0,0)
+black = (255,255,255)
+orange = (255,165,0)
+green = (0,250,0)
+red = (255,0,0)
 
 # print (dir(math))
 
@@ -44,7 +52,6 @@ class ball():
                 self.y + self.r
         )
 
-
     def move(self):
         """Переместить мяч по прошествии единицы времени.
 
@@ -52,18 +59,17 @@ class ball():
         self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
         и стен по краям окна (размер окна 800х600).
         """
-
-        if 0 <= self.x <= 800:
+        if 0 <= self.x <= 788:                     #FIXED
             self.x += self.vx
+            #if 0 <= self.y <= 688:
+            #    self.y -= self.vy
+            #else:
+            #   self.y += self.vy
         else:
             self.x -= self.vx
-        if 0 <= self.y <= 600:
-            self.y -= self.vy
-        else:
-            self.y += self.vy
 
 
-    def hittest(self, obj):
+    def hittest(self, obj):                  #FIXED
         """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
 
         Args:
@@ -71,18 +77,19 @@ class ball():
         Returns:
             Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
         """
-        if (obj.x,obj.y) == (self.x,self.y):
+        if ( np.sqrt( (self.x - obj.x)**2 + (- obj.y + self.y)**2) - self.r - obj.r) <= 0:
             return True
         else:
             return False
 
 
 class gun():
+
     def __init__(self):
         self.f2_power = 10
         self.f2_on = 0
         self.an = 1
-        self.id = canv.create_line(20,450,50,420,width=7)
+        self.id = canv.create_line(20,450,50,420,width=7)  #Fixed
 
     def fire2_start(self, event):
         self.f2_on = 1
@@ -112,7 +119,7 @@ class gun():
             canv.itemconfig(self.id, fill='orange')
         else:
             canv.itemconfig(self.id, fill='black')
-        canv.coords(self.id, 20, 450,
+            canv.coords(self.id, 20, 450,
                     20 + max(self.f2_power, 20) * math.cos(self.an),
                     450 + max(self.f2_power, 20) * math.sin(self.an)
                     )
@@ -127,7 +134,8 @@ class gun():
 
 
 class target():
-    def __init__(self):
+
+    def __init__(self):            #FIXED
         self.points = 0
         self.live = 1
 
@@ -178,10 +186,10 @@ def new_game(event=''):
                 canv.bind('<Button-1>', '')
                 canv.bind('<ButtonRelease-1>', '')
                 canv.itemconfig(screen1, text='Вы уничтожили цель за ' + str(bullet) + ' выстрелов')
-        canv.update()
-    time.sleep(0.03)
-    g1.targetting()
-    g1.power_up()
+        screen1.update()
+        time.sleep(0.03)
+        g1.targetting()
+        g1.power_up()
     canv.itemconfig(screen1, text='')
     canv.delete(gun)
     root.after(750, new_game)
